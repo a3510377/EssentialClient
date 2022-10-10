@@ -395,6 +395,7 @@ public class RenderHelper {
 	}
 
 	public static void renderBlocks(MatrixStack matrices) {
+		/* Clearing depth buffer is kinda spooky...
 		MinecraftClient client = EssentialUtils.getClient();
 		VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
 
@@ -407,6 +408,7 @@ public class RenderHelper {
 		ScriptFakeBlock.forEachIgnoreDepth(f -> renderFakeBlock(client, matrices, f, immediate));
 		immediate.draw(NO_CULL_BLOCK_LAYER);
 		immediate.draw(CULL_BLOCK_LAYER);
+		*/
 	}
 
 	private static void renderFakeBlock(MinecraftClient client, MatrixStack matrices, ScriptFakeBlock fakeBlock, VertexConsumerProvider.Immediate immediate) {
