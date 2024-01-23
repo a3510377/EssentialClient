@@ -11,72 +11,70 @@ import static me.senseiwells.essentialclient.utils.network.NetworkUtils.DATA;
 import static me.senseiwells.essentialclient.utils.network.NetworkUtils.HELLO;
 
 public abstract class NetworkHandler {
-	private boolean available;
-	private ClientPlayNetworkHandler networkHandler;
+    private boolean available;
+    private ClientPlayNetworkHandler networkHandler;
 
-	public abstract Identifier getNetworkChannel();
+    public abstract Identifier getNetworkChannel();
 
-	public abstract int getVersion();
+    public abstract int getVersion();
 
-	public void handlePacket(PacketByteBuf packetByteBuf, ClientPlayNetworkHandler networkHandler) {
-		if (packetByteBuf != null) {
-			int varInt = packetByteBuf.readVarInt();
-			switch (varInt) {
-				case HELLO -> this.onHello(packetByteBuf, networkHandler);
-				case DATA -> this.processData(packetByteBuf, networkHandler);
-				default -> this.customData(varInt, packetByteBuf, networkHandler);
-			}
-		}
-	}
+    public void handlePacket(PacketByteBuf packetByteBuf, ClientPlayNetworkHandler networkHandler) {
+        if (packetByteBuf != null) {
+            int varInt = packetByteBuf.readVarInt();
+            switch (varInt) {
+                case HELLO -> this.onHello(packetByteBuf, networkHandler);
+                case DATA -> this.processData(packetByteBuf, networkHandler);
+                default -> this.customData(varInt, packetByteBuf, networkHandler);
+            }
+        }
+    }
 
-	public final ClientPlayNetworkHandler getNetworkHandler() {
-		return this.networkHandler;
-	}
+    public final ClientPlayNetworkHandler getNetworkHandler() {
+        return this.networkHandler;
+    }
 
-	public final boolean isAvailable() {
-		return this.available;
-	}
+    public final boolean isAvailable() {
+        return this.available;
+    }
 
-	public final void onHello(PacketByteBuf packetByteBuf, ClientPlayNetworkHandler networkHandler) {
-		int v = packetByteBuf.readableBytes();
-		int d = packetByteBuf.readVarInt();
-		System.out.println("------------test------------");
-		System.out.println(v);
-		System.out.println(d);
-		System.out.println("------------------------");
-		if (v == 0 || d < this.getVersion()) {
-			this.onHelloFail();
-			return;
-		}
-		this.onHelloSuccess();
-		this.available = true;
-		this.networkHandler = networkHandler;
-		this.respondHello();
-	}
+    public final void onHello(PacketByteBuf packetByteBuf, ClientPlayNetworkHandler networkHandler) {
+        if (packetByteBuf.readableBytes() == 0 || packetByteBuf.readVarInt() < this.getVersion()) {
+            this.onHelloFail();
+            return;
+        }
+        this.onHelloSuccess();
+        this.available = true;
+        this.networkHandler = networkHandler;
+        this.respondHello();
+    }
 
-	public final void onHelloSinglePlayer() {
-		this.onHelloSuccess();
-		this.available = true;
-	}
+    public final void onHelloSinglePlayer() {
+        this.onHelloSuccess();
+        this.available = true;
+    }
 
-	protected void onHelloSuccess() { }
+    protected void onHelloSuccess() {
+    }
 
-	protected void onHelloFail() { }
+    protected void onHelloFail() {
+    }
 
-	private void respondHello() {
-		if (this.networkHandler != null) {
-			this.networkHandler.sendPacket(new CustomPayloadC2SPacket(
-				this.getNetworkChannel(),
-				new PacketByteBuf(Unpooled.buffer()).writeVarInt(HELLO).writeString(EssentialClient.VERSION).writeVarInt(this.getVersion())
-			));
-		}
-	}
+    private void respondHello() {
+        if (this.networkHandler != null) {
+            this.networkHandler.sendPacket(new CustomPayloadC2SPacket(
+                    this.getNetworkChannel(),
+                    new PacketByteBuf(Unpooled.buffer()).writeVarInt(HELLO).writeString(EssentialClient.VERSION).writeVarInt(this.getVersion())
+            ));
+        }
+    }
 
-	protected abstract void processData(PacketByteBuf packetByteBuf, ClientPlayNetworkHandler networkHandler);
+    protected abstract void processData(PacketByteBuf packetByteBuf, ClientPlayNetworkHandler networkHandler);
 
-	protected void customData(int varInt, PacketByteBuf packetByteBuf, ClientPlayNetworkHandler networkHandler) { }
+    protected void customData(int varInt, PacketByteBuf packetByteBuf, ClientPlayNetworkHandler networkHandler) {
+    }
 
-	public void onDisconnect() {
-		this.available = false;
-	}
+    public void onDisconnect() {
+        System.out.println("network handler disconnect");
+        this.available = false;
+    }
 }
