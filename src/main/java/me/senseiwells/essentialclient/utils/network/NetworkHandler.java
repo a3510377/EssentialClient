@@ -38,7 +38,13 @@ public abstract class NetworkHandler {
 	}
 
 	public final void onHello(PacketByteBuf packetByteBuf, ClientPlayNetworkHandler networkHandler) {
-		if (packetByteBuf.readableBytes() == 0 || packetByteBuf.readVarInt() < this.getVersion()) {
+		int v = packetByteBuf.readableBytes();
+		int d = packetByteBuf.readVarInt();
+		System.out.println("------------test------------");
+		System.out.println(v);
+		System.out.println(d);
+		System.out.println("------------------------");
+		if (v == 0 || d < this.getVersion()) {
 			this.onHelloFail();
 			return;
 		}
